@@ -27,13 +27,17 @@ namespace CustomLogin
         {
             services.AddControllersWithViews();
 
+            // Get AppSetting Value
             double LoginExpireMinute = this.Configuration.GetValue<double>("LoginExpireMinute");
 
+            // Registe CookieAuthentication, Scheme
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
                 option =>
                 {
                     option.LoginPath = new PathString("/Account/Login/Index");
                     option.LogoutPath = new PathString("/Home/Index");
+                    
+                    //Over Time
                     option.ExpireTimeSpan = TimeSpan.FromMinutes(LoginExpireMinute);
                 });
         }
@@ -56,11 +60,13 @@ namespace CustomLogin
 
             app.UseRouting();
 
+            // add Authentication
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                // add account area
                 endpoints.MapAreaControllerRoute(
                     name: "areaAccount",
                     areaName: "Account",
