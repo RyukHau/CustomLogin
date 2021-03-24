@@ -1,5 +1,6 @@
 ﻿using CustomLogin.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace CustomLogin.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,12 +23,13 @@ namespace CustomLogin.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Test"] = Request.Cookies["TestCookie"];
             return View();
         }
 
-        [Authorize]
         public IActionResult Privacy()
         {
+            ViewData["Test"] = Request.Cookies["TestCookie"];
             return View();
         }
 

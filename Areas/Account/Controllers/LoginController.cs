@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 
 namespace CustomLogin.Areas.Account.Controllers
 {
@@ -25,14 +26,14 @@ namespace CustomLogin.Areas.Account.Controllers
         {
             this.config = config;
         }
-        
+
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(LoginModel login)
+        public async Task<IActionResult> Index(LoginModel login, int? expireTime)
         {
             // check model
             if (ModelState.IsValid)
@@ -63,9 +64,22 @@ namespace CustomLogin.Areas.Account.Controllers
                     // IsPersistent = false，web will close and logout
                     // if web over setting will logout
                     /* ExpiresUtc = DateTime.Now.AddMinutes(loginExpireMinute) */
-                     await HttpContext.SignInAsync(principal, new AuthenticationProperties() { IsPersistent = false, });
+                    await HttpContext.SignInAsync(principal, new AuthenticationProperties() { IsPersistent = false, });
 
-                    return Redirect("/Home/Index");
+                    CookieOptions option = new CookieOptions();
+
+                    if (expireTime.HasValue)
+                    {
+                        option.Expires = DateTime.Now.AddMinutes(expireTime.Value);
+                    }
+                    else
+                    {
+                        option.Expires = DateTime.Now.AddMinutes(5);
+                    }
+
+                    Response.Cookies.Append("TestCookie",login.LoginAccount,option);
+
+                    return Redirect("/");
                 }
             }
             else
@@ -80,6 +94,8 @@ namespace CustomLogin.Areas.Account.Controllers
         {
             //logout
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("TestCookie");
+            ViewData["Data"] = null;
             return Redirect("/Home/Privacy");
         }
     }

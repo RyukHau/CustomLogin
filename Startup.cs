@@ -26,6 +26,7 @@ namespace CustomLogin
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Get AppSetting Value
             double LoginExpireMinute = this.Configuration.GetValue<double>("LoginExpireMinute");
