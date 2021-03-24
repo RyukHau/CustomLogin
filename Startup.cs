@@ -26,7 +26,6 @@ namespace CustomLogin
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Get AppSetting Value
             double LoginExpireMinute = this.Configuration.GetValue<double>("LoginExpireMinute");
@@ -35,9 +34,6 @@ namespace CustomLogin
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
                 option =>
                 {
-                    option.LoginPath = new PathString("/Account/Login/Index");
-                    option.LogoutPath = new PathString("/Home/Index");
-                    
                     //Over Time
                     option.ExpireTimeSpan = TimeSpan.FromMinutes(LoginExpireMinute);
                 });
