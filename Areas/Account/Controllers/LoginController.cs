@@ -40,7 +40,7 @@ namespace CustomLogin.Areas.Account.Controllers
             {
 
                 // check account
-                if (((login.LoginAccount == "test") && (login.LoginPassword == "test")) == false)
+                if (((login.LoginAccount == "test") && (login.LoginPassword == "test") || (login.LoginAccount == "abc") && (login.LoginPassword == "abc")) == false)
                 {
                     ViewBag.errMsg = "Login Fail";
 
@@ -49,35 +49,24 @@ namespace CustomLogin.Areas.Account.Controllers
                 else
                 {
                     // get login account
-                    Claim[] claims = new[] { new Claim("Account", login.LoginAccount) };
+                    Claim[] claims = new[] { new Claim(ClaimTypes.Name, login.LoginAccount) };
 
                     // scheme
                     ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    
-                    // Login
-                    ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
-
 
                     // get over setting value
                     double loginExpireMinute = this.config.GetValue<double>("LoginExpireMinute");
 
+                    // Login
+                    ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
+
                     // IsPersistent = false，web will close and logout
                     // if web over setting will logout
                     /* ExpiresUtc = DateTime.Now.AddMinutes(loginExpireMinute) */
-                    await HttpContext.SignInAsync(principal, new AuthenticationProperties() { IsPersistent = false, });
-
-                    CookieOptions option = new CookieOptions();
-
-                    if (expireTime.HasValue)
-                    {
-                        option.Expires = DateTime.Now.AddMinutes(expireTime.Value);
-                    }
-                    else
-                    {
-                        option.Expires = DateTime.Now.AddMinutes(5);
-                    }
-
-                    Response.Cookies.Append("TestCookie",login.LoginAccount,option);
+                    await HttpContext.SignInAsync(principal, new AuthenticationProperties() { 
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(loginExpireMinute), 
+                        IsPersistent = false, 
+                    });
 
                     return Redirect("/");
                 }
@@ -94,8 +83,7 @@ namespace CustomLogin.Areas.Account.Controllers
         {
             //logout
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            Response.Cookies.Delete("TestCookie");
-            ViewData["Data"] = null;
+
             return Redirect("/Home/Privacy");
         }
     }

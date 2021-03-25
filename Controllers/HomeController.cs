@@ -21,15 +21,14 @@ namespace CustomLogin.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
-            ViewData["Test"] = Request.Cookies["TestCookie"];
             return View();
         }
 
         public IActionResult Privacy()
         {
-            ViewData["Test"] = Request.Cookies["TestCookie"];
             return View();
         }
 

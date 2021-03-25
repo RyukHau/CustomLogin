@@ -1,9 +1,9 @@
 ﻿<ul class="navbar-nav">
 
-    @if (@ViewData["Test"] != null)
+    @if (User.Identity.Name != null)
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Account" asp-controller="Login" asp-action="Logout">@ViewData["Test"] LogOut</a>
+            <a class="nav-link text-dark" asp-area="Account" asp-controller="Login" asp-action="Logout">@User.Identity.Name LogOut</a>
         </li>
     }
     else
